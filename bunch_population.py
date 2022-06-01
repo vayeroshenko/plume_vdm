@@ -10,7 +10,7 @@ os.environ['PYSPARK_PYTHON']="./environment/bin/python"
 spark = spark_session_builder.get_or_create(flavor=Flavor.YARN_MEDIUM, 
 	conf={'spark.executor.memory': '20g'},
 	hadoop_env="pro")
-print(spark.sparkContext.parallelize(range(2)).map(lambda x: x).collect())
+print(spark.sparkContext.parallelize(range(1)).map(lambda x: x).collect())
 
 # import pandas as pd
 
@@ -41,7 +41,7 @@ def export_fbct(time_range, name="test"):
     data.columns = data.columns.str.replace('nxcals_timestamp', 'time')
     data = data.set_index(['time', 'bxid', 'nxcals_variable_name']).unstack()
     data = data.nxcals_N.rename_axis([None], axis=1).reset_index()
-    data.to_csv(f"fast_{name}.csv")
+    data.to_csv(f"Data/fast_{name}.csv")
     print("CSV saved successfully! (FAST)")
 
 def export_dc(time_range, name="test"):
@@ -62,10 +62,10 @@ def export_dc(time_range, name="test"):
     data.columns = data.columns.str.replace('nxcals_timestamp', 'time')
     data = data.set_index(['time', 'nxcals_variable_name']).unstack()
     data = data.nxcals_N.rename_axis([None], axis=1).reset_index()
-    data.to_csv(f"dc_{name}.csv")
+    data.to_csv(f"Data/dc_{name}.csv")
     print("CSV saved successfully! (DC)")
 
-time = ('2022-05-24 06:00:00.000', '2022-05-24 08:00:00.000')
+time = ('2022-05-29 10:00:00.000', '2022-05-29 10:30:00.000')
 
 export_fbct(time, name="test")
 export_dc(time, name="test")

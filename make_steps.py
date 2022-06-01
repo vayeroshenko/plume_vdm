@@ -28,11 +28,11 @@ def make_fast_spline(scans, fast, group, bxid):
 
 def make_dc(fill, overwrite=True):
 	if not overwrite:
-		dc_spline = pd.read_csv(f'dc_spline.{fill}.gz', index_col=0).reset_index(drop=True)
+		dc_spline = pd.read_csv(f'Data/dc_spline.{fill}.gz', index_col=0).reset_index(drop=True)
 		return dc_spline
 
-	scans = pd.read_csv(f'scans.{fill}.gz', compression="gzip")
-	dc = pd.read_csv(f'dc.{fill}.csv', index_col=0)
+	scans = pd.read_csv(f'Data/scans.{fill}.gz', compression="gzip")
+	dc = pd.read_csv(f'Data/dc.{fill}.csv', index_col=0)
 
 	dc['time']=dc['time']/1000000000
 
@@ -70,7 +70,7 @@ def make_dc(fill, overwrite=True):
 	dc_final['N.1'] = dc_final[dc_final.columns[dc_final.columns.str.contains('B1')]].mean(axis=1)
 	dc_final['N.2'] = dc_final[dc_final.columns[dc_final.columns.str.contains('B2')]].mean(axis=1)
 
-	dc_final.to_csv(f'dc_spline.{fill}.gz', compression='gzip')
+	dc_final.to_csv(f'Data/dc_spline.{fill}.gz', compression='gzip')
 
 	print("DC output has been saved...")
 
@@ -80,8 +80,8 @@ def make_fast(fill, overwrite=True):
 	if not overwrite:
 		fast_spline = pd.read_csv(f'fast_spline.{fill}.gz', index_col=0).reset_index(drop=True)
 		return fast_spline
-	scans = pd.read_csv(f'scans.{fill}.gz', compression="gzip")
-	fast = pd.read_csv(f'fast.{fill}.csv', index_col=0)
+	scans = pd.read_csv(f'Data/scans.{fill}.gz', compression="gzip")
+	fast = pd.read_csv(f'Data/fast.{fill}.csv', index_col=0)
 
 	fast['time']=fast['time']/1000000000
 
@@ -102,7 +102,7 @@ def make_fast(fill, overwrite=True):
 	    fast_spline = pd.concat([fast_spline, value], ignore_index=True)
 	    
 	# DataFrame is saved as CSV
-	fast_spline.to_csv(f'fast_spline.{fill}.gz', compression='gzip')
+	fast_spline.to_csv(f'Data/fast_spline.{fill}.gz', compression='gzip')
 
 	print("FAST output has been saved...")
 
@@ -128,7 +128,7 @@ def merge_steps(fill, fast, dc):
 	data['N.2'] = data[data.columns[data.columns.str.contains('R4.B2')]].mean(axis=1)
 
 	# DataFrame is saved as CSV
-	data.to_csv(f'scans_spline.{fill}.gz', compression='gzip')
+	data.to_csv(f'Data/scans_spline.{fill}.gz', compression='gzip')
 	return data
 
 
