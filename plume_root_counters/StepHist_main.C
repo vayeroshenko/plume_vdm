@@ -14,50 +14,50 @@ struct LumiCounters_ROOT {
   ULong64_t       EventInSequence;
   ULong64_t       EvtNumber;
   UInt_t          OrbitNumber;
-  ULong64_t       RunNumber;
+  UInt_t          RunNumber;
   UInt_t          bcid;
   ULong64_t       gpsTime;
-  UShort_t        lumi_channel_0;
-  UShort_t        lumi_channel_1;
-  UShort_t        lumi_channel_2;
-  UShort_t        lumi_channel_3;
-  UShort_t        lumi_channel_4;
-  UShort_t        lumi_channel_6;
-  UShort_t        lumi_channel_7;
-  UShort_t        lumi_channel_8;
-  UShort_t        lumi_channel_9;
-  UShort_t        lumi_channel_10;
-  UShort_t        lumi_channel_12;
-  UShort_t        lumi_channel_13;
-  UShort_t        lumi_channel_14;
-  UShort_t        lumi_channel_15;
-  UShort_t        lumi_channel_16;
-  UShort_t        lumi_channel_18;
-  UShort_t        lumi_channel_19;
-  UShort_t        lumi_channel_20;
-  UShort_t        lumi_channel_21;
-  UShort_t        lumi_channel_22;
-  UShort_t        lumi_channel_24;
-  UShort_t        lumi_channel_25;
-  UShort_t        lumi_channel_26;
-  UShort_t        lumi_channel_27;
-  UShort_t        lumi_channel_28;
-  UShort_t        lumi_channel_30;
-  UShort_t        lumi_channel_31;
-  UShort_t        lumi_channel_32;
-  UShort_t        lumi_channel_33;
-  UShort_t        lumi_channel_34;
-  UShort_t        lumi_channel_36;
-  UShort_t        lumi_channel_37;
-  UShort_t        lumi_channel_38;
-  UShort_t        lumi_channel_39;
-  UShort_t        lumi_channel_40;
-  UShort_t        lumi_channel_42;
-  UShort_t        lumi_channel_43;
-  UShort_t        lumi_channel_44;
-  UShort_t        lumi_channel_45;
-  UShort_t        lumi_channel_46;
-  UShort_t        lumi_channel_48;
+  Int_t        lumi_channel_0;
+  Int_t        lumi_channel_1;
+  Int_t        lumi_channel_2;
+  Int_t        lumi_channel_3;
+  Int_t        lumi_channel_4;
+  Int_t        lumi_channel_6;
+  Int_t        lumi_channel_7;
+  Int_t        lumi_channel_8;
+  Int_t        lumi_channel_9;
+  Int_t        lumi_channel_10;
+  Int_t        lumi_channel_12;
+  Int_t        lumi_channel_13;
+  Int_t        lumi_channel_14;
+  Int_t        lumi_channel_15;
+  Int_t        lumi_channel_16;
+  Int_t        lumi_channel_18;
+  Int_t        lumi_channel_19;
+  Int_t        lumi_channel_20;
+  Int_t        lumi_channel_21;
+  Int_t        lumi_channel_22;
+  Int_t        lumi_channel_24;
+  Int_t        lumi_channel_25;
+  Int_t        lumi_channel_26;
+  Int_t        lumi_channel_27;
+  Int_t        lumi_channel_28;
+  Int_t        lumi_channel_30;
+  Int_t        lumi_channel_31;
+  Int_t        lumi_channel_32;
+  Int_t        lumi_channel_33;
+  Int_t        lumi_channel_34;
+  Int_t        lumi_channel_36;
+  Int_t        lumi_channel_37;
+  Int_t        lumi_channel_38;
+  Int_t        lumi_channel_39;
+  Int_t        lumi_channel_40;
+  Int_t        lumi_channel_42;
+  Int_t        lumi_channel_43;
+  Int_t        lumi_channel_44;
+  Int_t        lumi_channel_45;
+  Int_t        lumi_channel_46;
+  Int_t        lumi_channel_48;
 };
 
 int main(int argc, char** argv) {
@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
   bool per_ee = false;
 
   if (argc > 2 && TString(argv[2]) != "per_ee") {
-    cut = (int)(size_t)argv[2];
+    cut = atoi(argv[2]);
   }
 
   if (argc == 3 && TString(argv[2]) == "per_ee") {
@@ -160,192 +160,159 @@ int main(int argc, char** argv) {
     ring_51 = 0,
     ring_52 = 0;
 
+    // std::cout << cut <<std::endl;
 
   bool interactive = true;
   for (Long64_t iEntry=0; iEntry<nEntries; ++iEntry) {
     tree->GetEntry(iEntry);
+
     // Counters preserve the number of the first layer number of PLUME.
     step_hist.add(
       r.gpsTime,
       0,
       r.bcid,
-      (r.lumi_channel_0 > cut && r.lumi_channel_24 > cut) ? 1 : 0
+      (r.lumi_channel_0 > cut && r.lumi_channel_24 > cut)
     );
     step_hist.add(
       r.gpsTime,
       1,
       r.bcid,
-      (r.lumi_channel_1 > cut && r.lumi_channel_25 > cut) ? 1 : 0
+      (r.lumi_channel_1 > cut && r.lumi_channel_25 > cut)
     );
     step_hist.add(
       r.gpsTime,
       2,
       r.bcid,
-      (r.lumi_channel_2 > cut && r.lumi_channel_26 > cut) ? 1 : 0
+      (r.lumi_channel_2 > cut && r.lumi_channel_26 > cut)
     );
     step_hist.add(
       r.gpsTime,
       3,
       r.bcid,
-      (r.lumi_channel_3 > cut && r.lumi_channel_27 > cut) ? 1 : 0
+      (r.lumi_channel_3 > cut && r.lumi_channel_27 > cut)
     );
     step_hist.add(
       r.gpsTime,
       4,
       r.bcid,
-      (r.lumi_channel_4 > cut && r.lumi_channel_28 > cut) ? 1 : 0
+      (r.lumi_channel_4 > cut && r.lumi_channel_28 > cut)
     );
     step_hist.add(
       r.gpsTime,
       6,
       r.bcid,
-      (r.lumi_channel_6 > cut && r.lumi_channel_30 > cut) ? 1 : 0
+      (r.lumi_channel_6 > cut && r.lumi_channel_30 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       7,
       r.bcid,
-      (r.lumi_channel_7 > cut && r.lumi_channel_31 > cut) ? 1 : 0
+      (r.lumi_channel_7 > cut && r.lumi_channel_31 > cut)
     );
     step_hist.add(
       r.gpsTime,
       8,
       r.bcid,
-      (r.lumi_channel_8 > cut && r.lumi_channel_32 > cut) ? 1 : 0
+      (r.lumi_channel_8 > cut && r.lumi_channel_32 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       9,
       r.bcid,
-      (r.lumi_channel_9 > cut && r.lumi_channel_33 > cut) ? 1 : 0
+      (r.lumi_channel_9 > cut && r.lumi_channel_33 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       10,
       r.bcid,
-      (r.lumi_channel_10 > cut && r.lumi_channel_34 > cut) ? 1 : 0
+      (r.lumi_channel_10 > cut && r.lumi_channel_34 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       12,
       r.bcid,
-      (r.lumi_channel_12 > cut && r.lumi_channel_36 > cut) ? 1 : 0
+      (r.lumi_channel_12 > cut && r.lumi_channel_36 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       13,
       r.bcid,
-      (r.lumi_channel_13 > cut && r.lumi_channel_37 > cut) ? 1 : 0
+      (r.lumi_channel_13 > cut && r.lumi_channel_37 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       14,
       r.bcid,
-      (r.lumi_channel_14 > cut && r.lumi_channel_38 > cut) ? 1 : 0
+      (r.lumi_channel_14 > cut && r.lumi_channel_38 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       15,
       r.bcid,
-      (r.lumi_channel_15 > cut && r.lumi_channel_39 > cut) ? 1 : 0
+      (r.lumi_channel_15 > cut && r.lumi_channel_39 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       16,
       r.bcid,
-      (r.lumi_channel_16 > cut && r.lumi_channel_40 > cut) ? 1 : 0
+      (r.lumi_channel_16 > cut && r.lumi_channel_40 > cut)
     );
     step_hist.add(
       r.gpsTime,
       18,
       r.bcid,
-      (r.lumi_channel_18 > cut && r.lumi_channel_42 > cut) ? 1 : 0
+      (r.lumi_channel_18 > cut && r.lumi_channel_42 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       19,
       r.bcid,
-      (r.lumi_channel_19 > cut && r.lumi_channel_43 > cut) ? 1 : 0
+      (r.lumi_channel_19 > cut && r.lumi_channel_43 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       20,
       r.bcid,
-      (r.lumi_channel_20 > cut && r.lumi_channel_44 > cut) ? 1 : 0
+      (r.lumi_channel_20 > cut && r.lumi_channel_44 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       21,
       r.bcid,
-      (r.lumi_channel_21 > cut && r.lumi_channel_45 > cut) ? 1 : 0
+      (r.lumi_channel_21 > cut && r.lumi_channel_45 > cut) 
     );
     step_hist.add(
       r.gpsTime,
       22,
       r.bcid,
-      (r.lumi_channel_22 > cut && r.lumi_channel_46 > cut) ? 1 : 0
+      (r.lumi_channel_22 > cut && r.lumi_channel_46 > cut) 
     );
 
 
-    if (
-      r.lumi_channel_0 > cut && r.lumi_channel_24 > cut &&
-      r.lumi_channel_6 > cut && r.lumi_channel_30 > cut &&
-      r.lumi_channel_12 > cut && r.lumi_channel_36 > cut &&
-      r.lumi_channel_18 > cut && r.lumi_channel_42 > cut
-    ) {
-      ring_48 = 1;
-    }
-    else {
-      ring_48 = 0;
-    }
+    ring_48 = (r.lumi_channel_0 > cut && r.lumi_channel_24 > cut) ||
+      (r.lumi_channel_6 > cut && r.lumi_channel_30 > cut) ||
+      (r.lumi_channel_12 > cut && r.lumi_channel_36 > cut) ||
+      (r.lumi_channel_18 > cut && r.lumi_channel_42 > cut);
 
-    if (
-      r.lumi_channel_1 > cut && r.lumi_channel_25 > cut &&
-      r.lumi_channel_7 > cut && r.lumi_channel_31 > cut &&
-      r.lumi_channel_13 > cut && r.lumi_channel_37 > cut &&
-      r.lumi_channel_19 > cut && r.lumi_channel_43 > cut
-    ) {
-      ring_49 = 1;
-    }
-    else {
-      ring_49 = 0;
-    }
+    ring_49 = (r.lumi_channel_1 > cut && r.lumi_channel_25 > cut) ||
+      (r.lumi_channel_7 > cut && r.lumi_channel_31 > cut) ||
+      (r.lumi_channel_13 > cut && r.lumi_channel_37 > cut) ||
+      (r.lumi_channel_19 > cut && r.lumi_channel_43 > cut); 
 
-    if (
-      r.lumi_channel_2 > cut && r.lumi_channel_26 > cut &&
-      r.lumi_channel_8 > cut && r.lumi_channel_32 > cut &&
-      r.lumi_channel_14 > cut && r.lumi_channel_38 > cut &&
-      r.lumi_channel_20 > cut && r.lumi_channel_44 > cut
-    ) {
-      ring_50 = 1;
-    }
-    else {
-      ring_50 = 0;
-    }
+    ring_50 = (r.lumi_channel_2 > cut && r.lumi_channel_26 > cut) ||
+      (r.lumi_channel_8 > cut && r.lumi_channel_32 > cut) ||
+      (r.lumi_channel_14 > cut && r.lumi_channel_38 > cut) ||
+      (r.lumi_channel_20 > cut && r.lumi_channel_44 > cut);
 
-    if (
-      r.lumi_channel_3 > cut && r.lumi_channel_27 > cut &&
-      r.lumi_channel_9 > cut && r.lumi_channel_33 > cut &&
-      r.lumi_channel_15 > cut && r.lumi_channel_39 > cut &&
-      r.lumi_channel_21 > cut && r.lumi_channel_45 > cut
-    ) {
-      ring_51 = 1;
-    }
-    else {
-      ring_51 = 0;
-    }
+    ring_51 = (r.lumi_channel_3 > cut && r.lumi_channel_27 > cut) ||
+      (r.lumi_channel_9 > cut && r.lumi_channel_33 > cut) ||
+      (r.lumi_channel_15 > cut && r.lumi_channel_39 > cut) ||
+      (r.lumi_channel_21 > cut && r.lumi_channel_45 > cut);
 
-    if (
-      r.lumi_channel_4 > cut && r.lumi_channel_28 > cut &&
-      r.lumi_channel_10 > cut && r.lumi_channel_34 > cut &&
-      r.lumi_channel_16 > cut && r.lumi_channel_40 > cut &&
-      r.lumi_channel_22 > cut && r.lumi_channel_46 > cut
-    ) {
-      ring_52 = 1;
-    }
-    else {
-      ring_52 = 0;
-    }
+    ring_52 = (r.lumi_channel_4 > cut && r.lumi_channel_28 > cut) ||
+      (r.lumi_channel_10 > cut && r.lumi_channel_34 > cut) ||
+      (r.lumi_channel_16 > cut && r.lumi_channel_40 > cut) ||
+      (r.lumi_channel_22 > cut && r.lumi_channel_46 > cut);
 
     // Counters from 48 to 52 are asigned from the inner to the outer rings in PLUME.
     step_hist.add(r.gpsTime, 48, r.bcid, ring_48);
@@ -360,7 +327,7 @@ int main(int argc, char** argv) {
       r.gpsTime,
       53,
       r.bcid,
-      (ring_48 == 1 && ring_49 == 1 && ring_50 == 1 && ring_51 == 1 && ring_52 == 1) ? 1 : 0
+      ( ring_48 || ring_49 || ring_50 || ring_51 || ring_52 )
     );
 
 
