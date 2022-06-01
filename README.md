@@ -1,6 +1,6 @@
 # PLUME VdM
 
-## Setting up NXCALS environment on lxplus
+## Setting up NXCALS environment on lxplus and extracting data from NXCALS
 
 ### Source
 https://nxcals-docs.web.cern.ch/current/user-guide/data-access/access-methods/#nxcals-spark-bundle
@@ -51,3 +51,12 @@ SparkSession available as 'spark'.
 >>> 
 >>> import bunch_population
 ```
+
+## Merging BCT data with scans table
+
+### Usage:
+```
+python make_steps.py --overwrite --fill 1234
+```
+The `--no-overwrite` option means the interpolated BCT data at the centers of the steps will be read from the stored tables instead of re-runing the interpolation again. This can save a lot of time since the interpolation algorithm is time consuming.
+- Known issue: it will fail with `--no-overwrite` option if the corresponding files don't exist.
