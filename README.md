@@ -1,5 +1,22 @@
 # PLUME VdM
 
+## Running snakemake workflow
+
+Optimized for using with `lb-conda default`. 
+
+```
+snakemake --cores 6 all
+```
+
+To get a report on the workflow:
+
+```
+snakemake all --report
+```
+After which you can open your `report.html` with a browser.
+To run a specific target specify a name instead of `all`
+
+
 ## Setting up NXCALS environment on lxplus and extracting data from NXCALS
 
 ### Source
