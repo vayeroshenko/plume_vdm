@@ -69,11 +69,12 @@ SparkSession available as 'spark'.
 >>> import bunch_population
 ```
 
-## Merging BCT data with scans table
+## Exporting the online counter data
 
-### Usage:
+For exporting the table with online counters from the PVSS archive run:
+
 ```
-python make_steps.py --overwrite --fill 1234
+./get_online_data.sh 7650 "29-05-2022 06:00:00" "29-05-2022 10:00:00"
 ```
-The `--no-overwrite` option means the interpolated BCT data at the centers of the steps will be read from the stored tables instead of re-runing the interpolation again. This can save a lot of time since the interpolation algorithm is time consuming.
-- Known issue: it will fail with `--no-overwrite` option if the corresponding files don't exist.
+
+Providing the script with a desired fill number and the time range (in UTC).
