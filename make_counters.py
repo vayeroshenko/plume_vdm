@@ -22,6 +22,7 @@ def counters(fill, run, overwrite=True):
         Saves a GZ compressed file containing DataFrame.
 
     """
+    run = int(run)
 
     if not overwrite:
         counters = pd.read_csv(f'Data/counters.{fill}.{run}.gz')
@@ -45,8 +46,8 @@ def counters(fill, run, overwrite=True):
                     + " " + scans['tmax'].astype(str) + "\n"
         time_str = bytes(time_range.sum(), 'utf-8')
     else:
-        time_range = scans['tmin'][scans['run'] == run].astype(str) \
-                     + " " + scans['tmax'][scans['run'] == run].astype(str) + "\n"
+        time_range = scans[scans['run'] == run]['tmin'].astype(str) \
+                     + " " + scans[scans['run'] == run]['tmax'].astype(str) + "\n"
         time_str = bytes(time_range.sum(), 'utf-8')
 
     print(f"{cmd}\n{time_str}")
@@ -68,5 +69,26 @@ def counters(fill, run, overwrite=True):
     counters.to_csv(f'Data/counters.{fill}.{run}.gz', compression='gzip')
     return counters
 
+import argparse
 if __name__ == '__main__':
-    counters("test", 231703, overwrite=True)
+    parser = argparse.ArgumentParser(description='Make fake scans table')
+    
+    parser.add_argument('--overwrite', action='store_true', 
+        help="Recalculate interpolation (takes time)")
+    parser.add_argument('--no-overwrite', dest='overwrite', action='store_false',
+        help="Use stored interpolated values from DC and FAST")
+    parser.set_defaults(overwrite=True)
+
+    parser.add_argument("-f", "--fill", 
+        type=str,
+        help="Fill number",
+        default="test" 
+    )
+    parser.add_argument("-r", "--run", 
+        type=str,
+        help="Run number",
+        default="231703" 
+    )
+    args = parser.parse_args()
+
+    counters(fill=args.fill, run=args.run, overwrite=args.overwrite)

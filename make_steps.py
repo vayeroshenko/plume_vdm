@@ -78,7 +78,7 @@ def make_dc(fill, overwrite=True):
 
 def make_fast(fill, overwrite=True):
 	if not overwrite:
-		fast_spline = pd.read_csv(f'fast_spline.{fill}.gz', index_col=0).reset_index(drop=True)
+		fast_spline = pd.read_csv(f'Data/fast_spline.{fill}.gz', index_col=0).reset_index(drop=True)
 		return fast_spline
 	scans = pd.read_csv(f'Data/scans.{fill}.gz', compression="gzip")
 	fast = pd.read_csv(f'Data/fast.{fill}.csv', index_col=0)
@@ -132,22 +132,31 @@ def merge_steps(fill, fast, dc):
 	return data
 
 
-def make_steps(fill, overwrite=True):
-	dc = make_dc(fill, overwrite=overwrite)
-	fast = make_fast(fill, overwrite=overwrite)
-	steps = merge_steps(fill, fast=fast, dc=dc)
+def make_steps(fill, overwrite_dc, overwrite_fast, st):
+	if overwrite_dc:
+		make_dc(fill, overwrite=overwrite_dc)
+	if overwrite_fast:
+		make_fast(fill, overwrite=overwrite_fast)
+	if st: 
+		dc = make_dc(fill, overwrite=False)
+		fast = make_fast(fill, overwrite=False)
+		steps = merge_steps(fill, fast=fast, dc=dc)
+
 
 import argparse
-
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Make steps table')
 
-	parser.add_argument('--overwrite', action='store_true', 
-		help="Recalculate interpolation (takes time)")
-	parser.add_argument('--no-overwrite', dest='overwrite', action='store_false',
-		help="Use stored interpolated values from DC and FAST")
-	parser.set_defaults(overwrite=True)
+	parser.add_argument('--dc', action='store_true', 
+		help="Recalculate DC interpolation",
+		default=False)
+	parser.add_argument('--fast', action='store_true', 
+		help="Recalculate FAST interpolation",
+		default=False)
+	parser.add_argument('--steps', action='store_true', 
+		help="Make steps",
+		default=False)
 	parser.add_argument("-f", "--fill", 
 	    type=str,
 	    help="Fill number", 
@@ -156,7 +165,8 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	# fill = 'test'
-	make_steps(args.fill, args.overwrite)
+	make_steps(fill=args.fill, overwrite_dc=args.dc, overwrite_fast=args.fast, 
+		st=args.steps)
 	
 
 

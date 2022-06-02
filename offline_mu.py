@@ -64,14 +64,32 @@ def make_offline_mu(fill, run):
     mu['mu.sp.err'] = 1e25 * mu['mu.err']/(mu['N.1']*mu['N.2'])
 
     # Rearrange the order of columns in DataFrame
-    mu = mu.iloc[:, [8,9,10,0,7,11,12,13,14,15,16,17,1,2,3,4,5,6,18,19,20,22,23,24,21,25,26,27]]
+    # mu = mu.iloc[:, [8,9,10,0,7,11,12,13,14,15,16,17,1,2,3,4,5,6,18,19,20,22,23,24,21,25,26,27]]
 
     # DataFrame is saved as gz compressed file
     mu.to_csv(f'Data/mu.{fill}.{run}.gz', compression='gzip')
     return mu
 
+import argparse
 if __name__ == '__main__':
     # Set fill and run of the counter
-    fill = "test"
-    run = 231703
-    make_offline_mu(fill=fill, run=run)
+
+    parser = argparse.ArgumentParser(description='Make fake scans table')
+
+    parser.set_defaults(overwrite=True)
+    parser.add_argument("-f", "--fill", 
+        type=str,
+        help="Fill number",
+        default="test" 
+    )
+    parser.add_argument("-r", "--run", 
+        type=str,
+        help="Run number",
+        default="231703" 
+    )
+    args = parser.parse_args()
+
+    # fill = "test"
+    # run = 231703
+    
+    make_offline_mu(fill=args.fill, run=args.run)
