@@ -90,7 +90,7 @@ def make_online_mu(fill):
     # scans=scans[["mu.bb","mu.err.bb","mu","mu.err","mu.inst"]] 
     scans = scans.drop(scans.columns[scans.columns.str.contains('N|be|eb|coinc')], axis=1)
 
-    steps = pd.read_csv("Data/scans_spline.test.gz")
+    steps = pd.read_csv(f"Data/scans_spline.{fill}.gz")
     
 
     steps = steps.merge(scans, how='left', on=['step.seq', 'step'], suffixes=('', '_DROP')).filter(regex='^(?!.*_DROP)')
@@ -109,11 +109,7 @@ if __name__ == '__main__':
         help="Fill number",
         default="test" 
     )
-    parser.add_argument("-r", "--run", 
-        type=str,
-        help="Run number",
-        default="231703" 
-    )
+
     args = parser.parse_args()
     make_online_mu(fill=args.fill)
 
