@@ -1,23 +1,31 @@
 import pandas as pd
 import numpy as np
 
+from datetime import datetime as dt
 
 def make_online_mu(fill):
 
     scans = pd.read_csv(f'Data/scans.{fill}.gz')
+    scans = scans[scans.scan == 1]
 
     online_mu = pd.read_csv(f'Data/lumivar_{fill}.csv')
-    online_mu['TS'] = online_mu['TS'].apply(lambda x:  pd.Timestamp(x).timestamp())
+    # online_mu['TS'] = online_mu['TS'].apply(lambda x:  pd.Timestamp(x).timestamp())
+    # 05-06-2022 05:29:59.30100000
+    # online_mu['TS'] = online_mu['TS'].apply(lambda x:  x)
+    online_mu['TS'] = online_mu['TS'].apply(lambda x:  dt.strptime(x[:-2], '%d-%m-%Y %H:%M:%S.%f').timestamp() )
     online_mu.columns = online_mu.columns.str.replace('TS', 'time')
 
-    print(online_mu)
-    print(scans)
+    # print(online_mu)
+    # print(scans)
 
     online_mu = online_mu.set_index(['time', ' DPE']).unstack()[' VALUE'].rename_axis([None], axis=1).reset_index()
     online_mu = online_mu.drop(online_mu.columns[online_mu.columns.str.contains('rate_coincidences_')], axis=1)
 
     online_mu.columns = online_mu.columns.str.replace('PLDAQTELL40:lumi_counters.', '')
     online_mu.columns = online_mu.columns.str.replace('value_', '')
+
+    online_mu.to_csv(f"Data/lumivar_parse.{fill}.csv")
+    # return 
 
     scans['mu.inst'] = np.nan
     scans['coinc.bb'] = np.nan
@@ -47,6 +55,7 @@ def make_online_mu(fill):
     #                 scans[scans['step.seq']==step_seq][scans.step == step][variable] = online_mu[variable.replace('.','_')][online_mu.time > tmin][online_mu.time < tmax].sum()
     #                 scans[scans['step.seq']==step_seq][scans.step == step][N] = tf - ti
 
+
     for step in scans.step:
         print(scans[scans.step == step])
         tmin = scans[scans.step == step].tmin.values[0]
@@ -69,9 +78,9 @@ def make_online_mu(fill):
         elif (bunch_type == 'be'): 
             return 2
         elif (bunch_type == 'eb'):
-            return 1
+            return 2
         else: 
-            return 3564 - (2+2+1)
+            return 3564 - (2+2+2)
 
     for variable in scans.columns:
         if ('coinc' in variable):
@@ -90,12 +99,13 @@ def make_online_mu(fill):
     # scans=scans[["mu.bb","mu.err.bb","mu","mu.err","mu.inst"]] 
     scans = scans.drop(scans.columns[scans.columns.str.contains('N|be|eb|coinc')], axis=1)
 
-    steps = pd.read_csv(f"Data/scans_spline.{fill}.gz")
+    # steps = pd.read_csv(f"Data/scans_spline.{fill}.gz")
     
 
-    steps = steps.merge(scans, how='left', on=['step.seq', 'step'], suffixes=('', '_DROP')).filter(regex='^(?!.*_DROP)')
+    # steps = steps.merge(scans, how='left', on=['step.seq', 'step'], suffixes=('', '_DROP')).filter(regex='^(?!.*_DROP)')
 
-    steps.to_csv(f"Data/online_mu.{fill}.gz")
+    scans.to_csv(f"Data/online_mu.{fill}.gz")
+    scans.to_csv(f"Data/online_mu.{fill}.csv")
 
 
 import argparse

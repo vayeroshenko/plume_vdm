@@ -27,147 +27,150 @@ def make_fast_spline(scans, fast, group, bxid):
 
 
 def make_dc(fill, overwrite=True):
-	if not overwrite:
-		dc_spline = pd.read_csv(f'Data/dc_spline.{fill}.gz', index_col=0).reset_index(drop=True)
-		return dc_spline
+    if not overwrite:
+        dc_spline = pd.read_csv(f'Data/dc_spline.{fill}.gz', index_col=0).reset_index(drop=True)
+        return dc_spline
 
-	scans = pd.read_csv(f'Data/scans.{fill}.gz', compression="gzip")
-	dc = pd.read_csv(f'Data/dc.{fill}.csv', index_col=0)
+    scans = pd.read_csv(f'Data/scans.{fill}.gz', compression="gzip")
+    dc = pd.read_csv(f'Data/dc.{fill}.csv', index_col=0)
 
-	dc['time']=dc['time']/1000000000
+    dc['time']=dc['time']/1000000000
 
-	dc_list=[]
+    dc_list=[]
 
-	for variable in dc.columns:
-	    if variable == "time": continue
-	#     dc_val = dc[variable].dropna()
-	    dc_val = dc[['time',variable]].dropna()
-	#     print(dc_val)
-	    kernel_size = 3
-	    kernel = np.ones(kernel_size)/kernel_size
-	    dc_val[variable] = convolve(dc_val[variable], kernel, mode='same', method='auto')
-	    dc_val = dc_val[1:-1]
-	    data_dc = scans.merge(dc_val, how='outer', on='time')
-	    dc_spline = data_dc.sort_values(by=['time'])
-	    dc_spline = dc_spline.reset_index(drop=True)
-	    dc_spline = dc_spline.set_index('time')
+    for variable in dc.columns:
+        if variable == "time": continue
+    #     dc_val = dc[variable].dropna()
+        dc_val = dc[['time',variable]].dropna()
+    #     print(dc_val)
+        kernel_size = 3
+        kernel = np.ones(kernel_size)/kernel_size
+        dc_val[variable] = convolve(dc_val[variable], kernel, mode='same', method='auto')
+        dc_val = dc_val[1:-1]
+        data_dc = scans.merge(dc_val, how='outer', on='time')
+        dc_spline = data_dc.sort_values(by=['time'])
+        dc_spline = dc_spline.reset_index(drop=True)
+        dc_spline = dc_spline.set_index('time')
 
-	    # Interpolation of each DC variable against time 
-	    dc_spline[variable] = dc_spline[variable].interpolate(method='spline', order=3)
-	    
-	    # Remove all time different from the scans file
-	    dc_spline = dc_spline[dc_spline['step'].notnull()]
-	    dc_spline = dc_spline.reset_index()
-	    
-	    dc_list.append(dc_spline[["step.seq","step", variable]])
-	    
-	dc_final = scans
-	    
-	for dc_var in dc_list:
-	    dc_final = dc_final.merge(dc_var, how='left', on=["step.seq","step"])
+        # Interpolation of each DC variable against time 
+        dc_spline[variable] = dc_spline[variable].interpolate(method='spline', order=3)
+        
+        # Remove all time different from the scans file
+        dc_spline = dc_spline[dc_spline['step'].notnull()]
+        dc_spline = dc_spline.reset_index()
+        
+        dc_list.append(dc_spline[["step.seq","step", variable]])
+        
+    dc_final = scans
+        
+    for dc_var in dc_list:
+        dc_final = dc_final.merge(dc_var, how='left', on=["step.seq","step"])
 
-	# dc_final
-	dc_final['N.1'] = dc_final[dc_final.columns[dc_final.columns.str.contains('B1')]].mean(axis=1)
-	dc_final['N.2'] = dc_final[dc_final.columns[dc_final.columns.str.contains('B2')]].mean(axis=1)
+    # dc_final
+    dc_final['N.1'] = dc_final[dc_final.columns[dc_final.columns.str.contains('B1')]].mean(axis=1)
+    dc_final['N.2'] = dc_final[dc_final.columns[dc_final.columns.str.contains('B2')]].mean(axis=1)
 
-	dc_final.to_csv(f'Data/dc_spline.{fill}.gz', compression='gzip')
+    dc_final.to_csv(f'Data/dc_spline.{fill}.gz', compression='gzip')
+    dc_final.to_csv(f'Data/dc_spline.{fill}.csv')
 
-	print("DC output has been saved...")
+    print("DC output has been saved...")
 
-	return dc_final
+    return dc_final
 
 def make_fast(fill, overwrite=True):
-	if not overwrite:
-		fast_spline = pd.read_csv(f'Data/fast_spline.{fill}.gz', index_col=0).reset_index(drop=True)
-		return fast_spline
-	scans = pd.read_csv(f'Data/scans.{fill}.gz', compression="gzip")
-	fast = pd.read_csv(f'Data/fast.{fill}.csv', index_col=0)
+    if not overwrite:
+        fast_spline = pd.read_csv(f'Data/fast_spline.{fill}.gz', index_col=0).reset_index(drop=True)
+        return fast_spline
+    scans = pd.read_csv(f'Data/scans.{fill}.gz', compression="gzip")
+    fast = pd.read_csv(f'Data/fast.{fill}.csv', index_col=0)
 
-	fast['time']=fast['time']/1000000000
+    fast['time']=fast['time']/1000000000
 
-	# Get variables names from FAST as a list
-	fast_columns = fast.columns[fast.columns.str.contains('B1|B2')]
-	        
-	# Define Dictionary to store DataFrames for each bxid
-	fast_dic = {}
-	# Perform Spline Interpolation for each bxid
-	for bxid in fast.bxid.unique():
-	    fast_dic[bxid] = fast[fast['bxid'] == bxid]
-	    fast_dic[bxid] = make_fast_spline(scans=scans, fast=fast, group=fast_dic[bxid], bxid=bxid)
-	    fast_dic[bxid] = fast_dic[bxid][fast_dic[bxid]['step'].notnull()]
+    # Get variables names from FAST as a list
+    fast_columns = fast.columns[fast.columns.str.contains('B1|B2')]
+            
+    # Define Dictionary to store DataFrames for each bxid
+    fast_dic = {}
+    # Perform Spline Interpolation for each bxid
+    for bxid in fast.bxid.unique():
+        fast_dic[bxid] = fast[fast['bxid'] == bxid]
+        fast_dic[bxid] = make_fast_spline(scans=scans, fast=fast, group=fast_dic[bxid], bxid=bxid)
+        fast_dic[bxid] = fast_dic[bxid][fast_dic[bxid]['step'].notnull()]
 
-	# Create new DataFrame including all bxids after interpolation 
-	fast_spline = pd.DataFrame()
-	for key, value in fast_dic.items():
-	    fast_spline = pd.concat([fast_spline, value], ignore_index=True)
-	    
-	# DataFrame is saved as CSV
-	fast_spline.to_csv(f'Data/fast_spline.{fill}.gz', compression='gzip')
+    # Create new DataFrame including all bxids after interpolation 
+    fast_spline = pd.DataFrame()
+    for key, value in fast_dic.items():
+        fast_spline = pd.concat([fast_spline, value], ignore_index=True)
+        
+    # DataFrame is saved as CSV
+    fast_spline.to_csv(f'Data/fast_spline.{fill}.gz', compression='gzip')
+    fast_spline.to_csv(f'Data/fast_spline.{fill}.csv')
 
-	print("FAST output has been saved...")
+    print("FAST output has been saved...")
 
-	return fast_spline
+    return fast_spline
 
 def merge_steps(fill, fast, dc):
-	# Create separate DataFrame to perform calibration
-	data = fast.copy()
+    # Create separate DataFrame to perform calibration
+    data = fast.copy()
 
-	# Create DataFrame with the sum of FAST values per time and for all bxids
-	fast_sum = fast.groupby(list(fast.columns[~fast.columns.str.contains('B1|B2|bxid')])) \
+    # Create DataFrame with the sum of FAST values per time and for all bxids
+    fast_sum = fast.groupby(list(fast.columns[~fast.columns.str.contains('B1|B2|bxid')])) \
        .sum().reset_index().drop('bxid',axis=1)
 
-	# Calibrate each FAST variable with DC and data_sum values for each beam
-	for bxid in data.bxid.unique():
-	    for column in data.columns[data.columns.str.contains('B1')]:
-	        data[column][data['bxid'] == bxid] = data[column][data['bxid'] == bxid].values*dc['N.1'].values/fast_sum[column].values
-	    for column in data.columns[data.columns.str.contains('B2')]:
-	        data[column][data['bxid'] == bxid] = data[column][data['bxid'] == bxid].values*dc['N.2'].values/fast_sum[column].values
+    # Calibrate each FAST variable with DC and data_sum values for each beam
+    for bxid in data.bxid.unique():
+        for column in data.columns[data.columns.str.contains('B1')]:
+            data[column][data['bxid'] == bxid] = data[column][data['bxid'] == bxid].values*dc['N.1'].values/fast_sum[column].values
+        for column in data.columns[data.columns.str.contains('B2')]:
+            data[column][data['bxid'] == bxid] = data[column][data['bxid'] == bxid].values*dc['N.2'].values/fast_sum[column].values
 
-	# Get bunch intensities calibrated for each beam and bxid
-	data['N.1'] = data[data.columns[data.columns.str.contains('R4.B1')]].mean(axis=1)
-	data['N.2'] = data[data.columns[data.columns.str.contains('R4.B2')]].mean(axis=1)
+    # Get bunch intensities calibrated for each beam and bxid
+    data['N.1'] = data[data.columns[data.columns.str.contains('R4.B1')]].mean(axis=1)
+    data['N.2'] = data[data.columns[data.columns.str.contains('R4.B2')]].mean(axis=1)
 
-	# DataFrame is saved as CSV
-	data.to_csv(f'Data/scans_spline.{fill}.gz', compression='gzip')
-	return data
+    # DataFrame is saved as CSV
+    data.to_csv(f'Data/scans_spline.{fill}.gz', compression='gzip')
+    data.to_csv(f'Data/scans_spline.{fill}.csv')
+    return data
 
 
 def make_steps(fill, overwrite_dc, overwrite_fast, st):
-	if overwrite_dc:
-		make_dc(fill, overwrite=overwrite_dc)
-	if overwrite_fast:
-		make_fast(fill, overwrite=overwrite_fast)
-	if st: 
-		dc = make_dc(fill, overwrite=False)
-		fast = make_fast(fill, overwrite=False)
-		steps = merge_steps(fill, fast=fast, dc=dc)
+    if overwrite_dc:
+        make_dc(fill, overwrite=overwrite_dc)
+    if overwrite_fast:
+        make_fast(fill, overwrite=overwrite_fast)
+    if st: 
+        dc = make_dc(fill, overwrite=False)
+        fast = make_fast(fill, overwrite=False)
+        steps = merge_steps(fill, fast=fast, dc=dc)
 
 
 import argparse
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description='Make steps table')
+    parser = argparse.ArgumentParser(description='Make steps table')
 
-	parser.add_argument('--dc', action='store_true', 
-		help="Recalculate DC interpolation",
-		default=False)
-	parser.add_argument('--fast', action='store_true', 
-		help="Recalculate FAST interpolation",
-		default=False)
-	parser.add_argument('--steps', action='store_true', 
-		help="Make steps",
-		default=False)
-	parser.add_argument("-f", "--fill", 
-	    type=str,
-	    help="Fill number", 
-	)
+    parser.add_argument('--dc', action='store_true', 
+        help="Recalculate DC interpolation",
+        default=False)
+    parser.add_argument('--fast', action='store_true', 
+        help="Recalculate FAST interpolation",
+        default=False)
+    parser.add_argument('--steps', action='store_true', 
+        help="Make steps",
+        default=False)
+    parser.add_argument("-f", "--fill", 
+        type=str,
+        help="Fill number", 
+    )
 
-	args = parser.parse_args()
+    args = parser.parse_args()
 
-	# fill = 'test'
-	make_steps(fill=args.fill, overwrite_dc=args.dc, overwrite_fast=args.fast, 
-		st=args.steps)
-	
+    # fill = 'test'
+    make_steps(fill=args.fill, overwrite_dc=args.dc, overwrite_fast=args.fast, 
+        st=args.steps)
+    
 
 
-	    
+        
