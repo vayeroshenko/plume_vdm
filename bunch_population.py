@@ -42,7 +42,7 @@ def export_fbct(time_range, name="test"):
     # data.time = data.time - 7200.e9
     data = data.set_index(['time', 'bxid', 'nxcals_variable_name']).unstack()
     data = data.nxcals_N.rename_axis([None], axis=1).reset_index()
-    data.to_csv(f"Data/fast_{name}.csv")
+    data.to_csv(f"Data/fast.{name}.csv")
     print("CSV saved successfully! (FAST)")
 
 def export_dc(time_range, name="test"):
@@ -64,12 +64,13 @@ def export_dc(time_range, name="test"):
     # data.time = data.time - 7200.e9
     data = data.set_index(['time', 'nxcals_variable_name']).unstack()
     data = data.nxcals_N.rename_axis([None], axis=1).reset_index()
-    data.to_csv(f"Data/dc_{name}.csv")
+    data.to_csv(f"Data/dc.{name}.csv")
     print("CSV saved successfully! (DC)")
 
 # time = ('2022-05-29 10:00:00.000', '2022-05-29 10:30:00.000')
-time = ('2022-06-05 05:30:00.000', '2022-06-05 08:00:00.000')
+# time = ('2022-06-05 05:30:00.000', '2022-06-05 08:00:00.000') ## Fill 7702
+time = ('2022-06-05 14:30:00.000', '2022-06-05 17:00:00.000') ## Fill 7703
 
-export_fbct(time, name="test")
-export_dc(time, name="test")
+export_fbct(time, name="7703")
+export_dc(time, name="7703")
 
