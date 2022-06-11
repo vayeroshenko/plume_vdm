@@ -1,0 +1,17 @@
+executable              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/offline_counters/StepHist.py
+arguments               = -i $(Process)
+initialdir              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/offline_counters/
+
+error                   = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/offline_counters/logs/errors.$(Process).txt
+log                     = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/offline_counters/logs/log.$(Process).log
+
+transfer_input_files	= /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/Data/scans.7703.gz, /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/plume_root_counters/step_hist
+
+should_transfer_files   = IF_NEEDED
+when_to_transfer_output = ON_EXIT
+
+request_memory          = 10 GB
++JobFlavour = "tomorrow"
+getenv = True
+
+queue 1
