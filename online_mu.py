@@ -74,7 +74,8 @@ def make_online_mu(fill):
 
     ########### WARNING: HARDCODED QUALITY CHECK #############
     # from 2.75s to 3.5s
-    scans['mu.inst'] = online_mu['mu_inst'][(online_mu.timestamp > 5.5e8) & (online_mu.timestamp < 7e8)]
+    # online_mu['mu.inst'] = online_mu['mu_inst'][(online_mu.timestamp > 5.5e8) & (online_mu.timestamp < 7e8)]
+    online_mu['mu_inst'] = online_mu[(online_mu['mu_inst']> 0) & (online_mu['mu_inst'] < 3e-3)]['mu_inst']
     ##########################################################
 
     for step in scans.step:
