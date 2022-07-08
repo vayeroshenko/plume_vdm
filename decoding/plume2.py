@@ -11,7 +11,7 @@
 
 run_number = 'RUNNUMBER'
 partition = 'LHCb'  ### or 'PLUME'
-partition = 'PLUME'
+#partition = 'PLUME'
 import glob
 from Gaudi.Configuration import VERBOSE, INFO
 
@@ -31,16 +31,29 @@ from PyConf.Algorithms import (
 
 options = ApplicationOptions(_enabled=False)
 
-options.input_type = "MDF"
+options.input_type = "RAW"
 ### run_number = 1022
 
+# if partition == 'LHCb':
+# 	options.input_files = [ 
+# 		list(glob.glob(f'/eos/lhcb/point8/lhcb/data/2022/RAW/FULL/LHCb/CALIBRATION22/{run_number}/*.raw'))[THRD], ]
+
+low = int(THRD*FILESPERJOB)
+high = int(low+FILESPERJOB)
+
+
 if partition == 'LHCb':
-	options.input_files = list(
-    		glob.glob(
-        		f'/hlt2/objects/LHCb/{run_number}/Run_{run_number}*.mdf'))
+    list_files = list(glob.glob(f'/eos/lhcb/point8/lhcb/data/2022/RAW/FULL/LHCb/RUNTYPE/{run_number}/*.raw'))
+    if high < len(list_files):
+        list_files = list_files[low:high]
+    else: 
+        list_files = list_files[low:]
+    options.input_files = list_files
+        # list(glob.glob(f'/eos/lhcb/point8/lhcb/data/2022/RAW/FULL/LHCb/COLLISION22/{run_number}/*.raw'))[THRD*20:(THRD+1)*20]
+
 else:
-	options.input_files = [ 
-		list(glob.glob(f'/eos/lhcb/point8/PLUME/{run_number}/Run_{run_number}*.mdf'))[THRD], ]
+    options.input_files = [ 
+        list(glob.glob(f'/eos/lhcb/point8/PLUME/{run_number}/Run_{run_number}*.mdf'))[THRD], ]
 # else:
 # 	options.input_files = list(
 # 		glob.glob(

@@ -1,14 +1,14 @@
-executable              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/run_thread.sh
-arguments               = $(i_thrd) 
-initialdir              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/
-error                   = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/logs/errors.$(i_thrd).txt
-log                     = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/logs/log.$(i_thrd).log
+#executable              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/run_thread.sh
+#arguments               = $(i_thrd) 
+#initialdir              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/
+#error                   = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/logs/errors.$(i_thrd).txt
+#log                     = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/logs/log.$(i_thrd).log
 
-# executable              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/run_thread.sh
-# arguments               = $(Process) 
-# initialdir              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/
-# error                   = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/logs/errors.$(Process).txt
-# log                     = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/logs/log.$(Process).log
+executable              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/run_thread.sh
+arguments               = $(Process) 
+initialdir              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/
+error                   = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/logs2/errors.$(Process).txt
+log                     = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/logs2/log.$(Process).log
 
 transfer_input_files	= plume2.py, run_thread.sh
 
@@ -16,54 +16,12 @@ should_transfer_files   = IF_NEEDED
 when_to_transfer_output = ON_EXIT
 
 request_memory          = 5 GB
+# +JobFlavour = "espresso"
 +JobFlavour = "longlunch"
+# +JobFlavour = "workday"
 getenv = True
 
-expected_runtime_minutes = 120
-#
-# Should not need to change the below...
-#
-job_machine_attrs = Machine
-job_machine_attrs_history_length = 4
-requirements = target.machine =!= MachineAttrMachine1 && \
-   target.machine =!= MachineAttrMachine2 && \
-   target.machine =!= MachineAttrMachine3
-periodic_hold = JobStatus == 2 && \
-   CurrentTime - EnteredCurrentStatus > 60 * $(expected_runtime_minutes)
-periodic_hold_subcode = 1
-periodic_release = HoldReasonCode == 3 && HoldReasonSubCode == 1 && \
-   JobRunCount < 3
-periodic_hold_reason = ifthenelse(JobRunCount<3,"Ran too long, will retry","Ran too long")
-
-# queue FILE matching (
-#     /eos/lhcb/point8/PLUME/0000232824/Run_0000232824*.mdf
-# )
-
-queue 1 i_thrd in 19, 71, 78
-
-
-
-
-
-
-
-# executable              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/run_thread_simple.sh
-# arguments               = $(job) $(file) 
-# initialdir              = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/
-# error                   = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/logs/errors.$(job).txt
-# log                     = /afs/cern.ch/work/v/vyeroshe/Plume_vdm/plume-vdm/decoding/logs/log.$(job).log
-
-# transfer_input_files	= $(file), run_thread_simple.sh
-
-# should_transfer_files   = IF_NEEDED
-# when_to_transfer_output = ON_EXIT
-
-# request_memory          = 5 GB
-# +JobFlavour = "longlunch"
-# getenv = True
-
-
-# expected_runtime_minutes = 120
+# expected_runtime_minutes = 20
 # #
 # # Should not need to change the below...
 # #
@@ -79,17 +37,11 @@ queue 1 i_thrd in 19, 71, 78
 #    JobRunCount < 3
 # periodic_hold_reason = ifthenelse(JobRunCount<3,"Ran too long, will retry","Ran too long")
 
-
-# # queue 1 input in 4, 12, 30, 49
-# queue job, file from (
-#   4, plume2_4.py
-#   12, plume2_12.py
-#   30, plume2_30.py
-#   49, plume2_49.py
-# )
-
 # queue FILE matching (
-#     plume2_*.py
-# )
+#     #/eos/lhcb/point8/lhcb/data/2022/RAW/FULL/LHCb/CALIBRATION22/235932/235932_00140007_1069.raw
+#     /eos/lhcb/point8/lhcb/data/2022/RAW/FULL/LHCb/CALIBRATION22/235932/*.raw
+#  )
 
-# queue 200
+queue 166
+
+#queue 1 i_thrd in 19, 71, 78
