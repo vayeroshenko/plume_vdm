@@ -32,7 +32,7 @@ def make_dc(fill, overwrite=True):
         return dc_spline
 
     scans = pd.read_csv(f'Data/scans.{fill}.gz', compression="gzip")
-    dc = pd.read_csv(f'Data/dc.{fill}.csv', index_col=0)
+    dc = pd.read_csv(f'Data/dc.{fill}.gz', index_col=0)
 
     dc['time']=dc['time']/1000000000
 
@@ -77,12 +77,27 @@ def make_dc(fill, overwrite=True):
 
     return dc_final
 
+def open_csv_fast(fill):
+    import glob
+
+    # get data file names
+    filenames = glob.glob(f"Data/fast.{fill}.part*.gz")
+
+    data = pd.read_csv(filenames[0])
+
+    for filename in filenames[1:]:
+        data.merge(pd.read_csv(filename), on=["time", "bxid"], how='outer')
+
+    # Concatenate all data into one DataFrame
+    return data
+
 def make_fast(fill, overwrite=True):
     if not overwrite:
         fast_spline = pd.read_csv(f'Data/fast_spline.{fill}.gz', index_col=0).reset_index(drop=True)
         return fast_spline
     scans = pd.read_csv(f'Data/scans.{fill}.gz', compression="gzip")
-    fast = pd.read_csv(f'Data/fast.{fill}.csv', index_col=0)
+    # fast = pd.read_csv(f'Data/fast.{fill}.csv', index_col=0)
+    fast = open_csv_fast(fill)
 
     fast['time']=fast['time']/1000000000
 
