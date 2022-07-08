@@ -1,6 +1,7 @@
 
-fill = "7702"
-run = 232719
+fill = "7923"
+run = 236561
+
 
 # rule all:
 #   input:  f'Data/xsec.{fill}.{run}.gz', 
@@ -41,31 +42,37 @@ rule online_mu:
     output: "Data/online_mu.{fill}.gz"
     shell: "python online_mu.py --fill {wildcards.fill}"
 
-rule counters_hist:
-    input:
-        bin = "plume_root_counters/step_hist",
-        scans = "Data/scans.{fill}.gz"
-    output: "Data/counters.{fill}.{run}.gz"
-    shell: "python make_counters.py --fill {wildcards.fill} --run {wildcards.run} --overwrite"
+# rule counters_hist:
+#     input:
+#         bin = "plume_root_counters/step_hist",
+#         scans = "Data/scans.{fill}.gz"
+#     output: "Data/counters.{fill}.{run}.gz"
+#     shell: "python make_counters.py --fill {wildcards.fill} --run {wildcards.run} --overwrite"
 
 
 ################## Rules to make steps (scans spline)
+rule bunch_pop_shape:
+    input:
+        dc = "Data/dc.raw.{fill}.csv",
+        fast = "Data/fast.raw.{fill}.csv"
+    output: "Data/dc.{fill}.gz", "Data/fast.{fill}.part_0.gz"
+    shell: "python bunch_population_shape.py --fill {wildcards.fill}"
+
 rule scans_spline:
     input:
         scans= "Data/scans.{fill}.gz",
         dc = "Data/dc_spline.{fill}.gz",
         fast = "Data/fast_spline.{fill}.gz"
-    output:
-        "Data/scans_spline.{fill}.gz"
+    output: "Data/scans_spline.{fill}.gz"
     shell: "python make_steps.py --fill {wildcards.fill} --steps"
 
 rule make_fast_spline:
-    input: "Data/scans.{fill}.gz", "Data/fast.{fill}.csv"
+    input: "Data/scans.{fill}.gz", "Data/fast.{fill}.part_0.gz"
     output: "Data/fast_spline.{fill}.gz"
     shell: "python make_steps.py --fill {wildcards.fill} --fast"
 
 rule make_dc_spline:
-    input: "Data/scans.{fill}.gz", "Data/dc.{fill}.csv"
+    input: "Data/scans.{fill}.gz", "Data/dc.{fill}.gz"
     output: "Data/dc_spline.{fill}.gz"
     shell: "python make_steps.py --fill {wildcards.fill} --dc"
 ###################################
