@@ -6,7 +6,8 @@ import json
 
 def make_offline_mu(fill, run):
     # Read counters and scans file with beam intensities
-    counters = pd.read_csv(f'Data/counters.{fill}.{run}.gz', index_col=0)
+    counters = pd.read_csv(f'Data/counters.{fill}.{run}.gz')
+    # counters = pd.read_csv(f'Data/counters-{fill}-{run}.gz', index_col=0)
     scans = pd.read_csv(f'Data/scans_spline.{fill}.gz', index_col=0)
 
     # Function transforms beam 2 bxid to beam 1 bxid for LHCb
@@ -20,7 +21,7 @@ def make_offline_mu(fill, run):
     # Group by time, counter and bxid to sum all events.
     N = counters.groupby(['time', 'counter', 'bxid']) \
            .sum().reset_index().drop('bin',axis=1)
-    N.columns = N.columns.str.replace('events', 'N')
+    N.columns = N.columns.str.replace('counters', 'N')
 
     # Create DataFrame from counters for empty events
     N0 = counters.copy()
@@ -32,14 +33,19 @@ def make_offline_mu(fill, run):
     # Group by time, counter and bxid to sum all empty events.
     N0 = N0.groupby(['time', 'counter', 'bxid']) \
            .sum().reset_index().drop('bin',axis=1)
-    N0.columns = N0.columns.str.replace('events', 'N0')
+    N0.columns = N0.columns.str.replace('counters', 'N0')
 
     # Merge all and empty events in one table to calculate mu with logzero method
     mu = pd.merge(N0, N, how='left', on=['time', 'counter', 'bxid'])
-
+   
+    # print(mu)
     # Rename column names to match scans names
-    mu.columns = mu.columns.str.replace('bxID', 'bxid')
+    # mu.columns = mu.columns.str.replace('bxID', 'bxid')
     mu.columns = mu.columns.str.replace('time', 'tmin')
+    # mu.columns = mu.columns.str.replace('counters_x', 'N0')
+    # mu.columns = mu.columns.str.replace('counters_y', 'N')
+    
+
 
     # Calculate mu with logzero method and its error 
     mu['mu'] = -np.log(mu['N0']/mu['N'])

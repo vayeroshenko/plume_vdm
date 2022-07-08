@@ -5,26 +5,32 @@ from numpy import sqrt
 
 from datetime import datetime as dt
 
+# def n_bunch_type(bunch_type):
+#     if (bunch_type == 'bb'):
+#         return 2
+#     elif (bunch_type == 'be'): 
+#         return 2
+#     elif (bunch_type == 'eb'):
+#         return 2
+#     else: 
+#         return 3564 - (2+2+2)
+
 def n_bunch_type(bunch_type):
     if (bunch_type == 'bb'):
-        return 2
+        return 8
     elif (bunch_type == 'be'): 
-        return 2
+        return 4
     elif (bunch_type == 'eb'):
-        return 2
+        return 4
     else: 
-        return 3564 - (2+2+2)
+        return 3564 - 12
 
 def transform(bxid):
     return (bxid + 894 - 1) % 3564 + 1
 
 f = 11245 
 
-def make_online_mu(fill):
-
-    scans = pd.read_csv(f'Data/scans.{fill}.gz')
-    scans = scans[scans.scan == 1]
-
+def parse_online_mu(fill):
     online_mu = pd.read_csv(f'Data/lumivar_{fill}.csv')
     # online_mu['TS'] = online_mu['TS'].apply(lambda x:  pd.Timestamp(x).timestamp())
     # 05-06-2022 05:29:59.30100000
@@ -40,7 +46,16 @@ def make_online_mu(fill):
     online_mu.columns = online_mu.columns.str.replace('value_', '')
 
     online_mu.to_csv(f"Data/lumivar_parse.{fill}.csv")
-    # return 
+    return online_mu
+  
+
+def make_online_mu(fill):
+
+    scans = pd.read_csv(f'Data/scans.{fill}.gz')
+    scans = scans[scans.scan == 1]
+
+  # return 
+    online_mu = parse_online_mu(fill)
 
     scans['mu.inst'] = np.nan
     scans['mu.inst.err'] = np.nan
@@ -75,8 +90,12 @@ def make_online_mu(fill):
     ########### WARNING: HARDCODED QUALITY CHECK #############
     # from 2.75s to 3.5s
     # online_mu['mu.inst'] = online_mu['mu_inst'][(online_mu.timestamp > 5.5e8) & (online_mu.timestamp < 7e8)]
-    online_mu['mu_inst'] = online_mu[(online_mu['mu_inst']> 0) & (online_mu['mu_inst'] < 3e-3)]['mu_inst']
+    # online_mu['mu_inst'] = online_mu[(online_mu['mu_inst']> 0) & (online_mu['mu_inst'] < 3e-3)]['mu_inst']
     ##########################################################
+
+    # print(scans)
+    # print(online_mu)
+    # exit()
 
     for step in scans.step:
         tmin = scans[scans.step == step].tmin.values[0] + 2
@@ -140,6 +159,10 @@ def make_online_mu(fill):
     # Calculate the value of mu specific and its error
     scans['mu.inst.sp'] = 1e25 * scans['mu.inst']/(scans['N1.N2.av'])
     scans['mu.inst.sp.err'] = 1e25 * scans['mu.inst.err']/(scans['N1.N2.av'])
+
+    scans['mu.sp'] = 1e25 * scans['mu']/(scans['N1.N2.av'])
+    scans['mu.sp.err'] = 1e25 * scans['mu.err']/(scans['N1.N2.av'])
+    
     # mu['mu.sp.err'] = 1e25 * mu['mu.err']/(mu['N.1']*mu['N.2'])
 
     scans.to_csv(f"Data/online_mu.{fill}.gz")
@@ -158,6 +181,17 @@ if __name__ == '__main__':
         default="test" 
     )
 
+    just_parse = False
+    parser.add_argument('-p', "--parse", action='store_const', 
+        help="Transform online counters dump and exit",
+        default=just_parse, 
+        const=not(just_parse))
+
     args = parser.parse_args()
+
+    if args.parse:
+        parse_online_mu(fill=args.fill)
+        exit()
+
     make_online_mu(fill=args.fill)
 
