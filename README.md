@@ -1,5 +1,20 @@
 # PLUME VdM
 
+## Requirements
+
+See `environment.yml` file.
+```
+- python=3.8
+- pandas
+- scipy
+- iminuit
+- matplotlib
+- numpy
+```
+
+`Snakemake` is optional but very convenient. Instructions: 
+https://snakemake.readthedocs.io/en/stable/getting_started/installation.html
+
 ## Running snakemake workflow
 
 Optimized for using with `lb-conda default`. 
